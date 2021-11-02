@@ -25,12 +25,13 @@ int digits[]={
   B1011111,//95
   B0110001,//49
   B1111111,//127
-  B1111011 //123
+  B1111011, //123
+  B0000001 //1=For second
 };
 
 void setup() {
   rtc.begin();
-  Serial.begin(9600);
+  //Serial.begin(9600);
   
   pinMode(gnd,OUTPUT),digitalWrite(gnd,LOW);
   pinMode(v5,OUTPUT),digitalWrite(v5,HIGH);
@@ -48,8 +49,8 @@ void setup() {
 
 int i=1;
 void loop() {
-  if (milliSec>500) glowSec=!glowSec, milliSec=0;
-  milliSec++;
+  milliSec>2000 ? milliSec=0 : milliSec++;
+  
   t = rtc.getTime();
   showTime();
 }
@@ -60,15 +61,22 @@ void showTime(){
    showDigit(g5, digits[m%10]);
    showDigit(g1, digits[m/10]);
 
-   //blinkSecond();
-   //if (glowSec) showDigit(g3,1);
+   //if (milliSec>1000) showDigit(g3,digits[10]);
 
    int h=t.hour%12;
    if (!h) h=12;
    showDigit(g2, digits[h%10]);
    showDigit(g4, digits[h/10]);
     
-  Serial.println(milliSec);
+  //Serial.println(milliSec);
+}
+
+void showDigit(int dg, int digitValue){
+  digitalWrite(dg,0);
+  digitalWrite(latchPin, 0);
+  shiftOut(dataPin,clockPin, LSBFIRST, digitValue);
+  digitalWrite(latchPin, 1);
+  digitalWrite(dg,1);
 }
 
 void blinkSecond(){
@@ -83,12 +91,9 @@ void blinkLED(int x){
   digitalWrite(latchPin, HIGH);
 }
 
-void showDigit(int dGnd, int digitValue){
-  digitalWrite(dGnd,0);
-  
-  digitalWrite(latchPin, LOW);
-  shiftOut(dataPin,clockPin, LSBFIRST, digitValue);
-  digitalWrite(latchPin, HIGH);
-  
-  digitalWrite(dGnd,1);
+void setTime(){
+  //For set time please uncomment these lines.
+   rtc.setDOW(SATURDAY);
+   rtc.setTime(04,21,00);//hh,mm,ss
+   rtc.setDate(03,11,2021); //dd,MM,yyyy
 }
