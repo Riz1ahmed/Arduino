@@ -49,7 +49,7 @@ void setup() {
 
 int i=1;
 void loop() {
-  milliSec>2000 ? milliSec=0 : milliSec++;
+  milliSec>1000 ? milliSec=0 : milliSec++;
   
   t = rtc.getTime();
   showTime();
@@ -61,11 +61,12 @@ void showTime(){
    showDigit(g5, digits[m%10]);
    showDigit(g1, digits[m/10]);
 
-   //if (milliSec>1000) showDigit(g3,digits[10]);
-
    int h=t.hour%12;
    if (!h) h=12;
-   showDigit(g2, digits[h%10]);
+   if (milliSec>500){
+     showDigit(g2,digits[10]);
+     showDigit(g3, digits[h%10]);
+   }else showDigit(g2, digits[h%10]);
    showDigit(g4, digits[h/10]);
     
   //Serial.println(milliSec);
